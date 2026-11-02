@@ -1,0 +1,42 @@
+ACKUMEN 2027 — DEPLOY TO VERCEL
+================================
+
+This is a static HTML/CSS/JavaScript website. Vercel hosts the frontend; Supabase remains the authentication and database backend.
+
+A) PREPARE THE WEBSITE
+1. Extract ACKUMEN_2027_SUPABASE_VERCEL.zip.
+2. Open the ACKUMEN_2027 folder.
+3. Edit js/supabase-config.js and replace the placeholder Project URL and anon/public key with your own Supabase values.
+   - Supabase Dashboard > Project Settings > API.
+   - Use only the anon/public key in browser code.
+   - NEVER put the service_role/secret key in this folder.
+4. Follow SETUP_SUPABASE.txt and run supabase/schema.sql in Supabase SQL Editor.
+
+B) DEPLOY WITH GITHUB (RECOMMENDED)
+1. Create a GitHub repository, for example ackumen-2027.
+2. Upload the CONTENTS of the ACKUMEN_2027 folder to the repository (index.html should be at the repository root).
+3. Visit https://vercel.com/ and sign in with GitHub.
+4. Select Add New > Project, then Import the ackumen-2027 repository.
+5. Framework Preset: Other.
+6. Root Directory: ./ (leave as repository root, since index.html is at root).
+7. Build Command: leave empty / override disabled.
+8. Output Directory: leave empty / default (static files are served from the project root).
+9. Click Deploy.
+
+C) CONNECT THE VERCEL DOMAIN TO SUPABASE
+1. Copy the deployed HTTPS URL from Vercel, e.g. https://your-project.vercel.app.
+2. In Supabase > Authentication > URL Configuration:
+   - Set Site URL to the Vercel HTTPS URL.
+   - Add https://your-project.vercel.app/verify.html to Redirect URLs.
+   - Add https://your-project.vercel.app/reset-password.html to Redirect URLs.
+3. Save the settings and test signup, email confirmation, phone OTP, login and password reset.
+4. For a custom domain, add that domain and its verify/reset URLs too.
+
+D) IMPORTANT
+- Deploy the folder contents, not a nested folder that leaves index.html one level below the Vercel root.
+- Do not use file:// to test. Use a local web server such as VS Code Live Server.
+- Email confirmation needs working email delivery/SMTP for production.
+- SMS OTP needs a configured Supabase-supported SMS provider and may cost money.
+- Vercel only hosts the static frontend. Supabase handles accounts, verification and registrations.
+- The three-event limit and duplicate-registration protection are enforced in the Supabase database schema.
+- Do not commit passwords, service_role keys, or SMS provider secrets to GitHub.

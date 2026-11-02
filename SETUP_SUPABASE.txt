@@ -1,0 +1,57 @@
+ACKUMEN 2027 — SUPABASE SETUP
+================================
+This package is a static HTML/CSS/JavaScript frontend. Supabase provides hosted authentication and PostgreSQL. You must connect your own Supabase project before live signup, OTP, password reset or event registration can work.
+
+1) CREATE A SUPABASE PROJECT
+- Visit https://supabase.com/ and create a project.
+- In Project Settings > API, copy the Project URL and anon/public key.
+- Open js/supabase-config.js and replace YOUR-PROJECT and YOUR_SUPABASE_ANON_KEY.
+- NEVER put the service_role/secret key in any HTML or JavaScript file.
+
+2) CREATE THE DATABASE
+- In Supabase Dashboard > SQL Editor, create a new query.
+- Paste and run the complete file supabase/schema.sql.
+- This creates profiles, events and event_registrations, row-level security policies, and a database trigger that enforces at most 3 registrations per participant.
+- The 12 event names are the sample names already present on the supplied website. Edit the events table or SQL seed before opening registration if the final event list differs.
+
+3) ENABLE EMAIL AUTHENTICATION
+- Go to Authentication > Providers > Email and enable Email provider.
+- Keep email confirmation enabled. Configure SMTP under Authentication > SMTP Settings for reliable delivery to participants (Supabase's default mail service is limited for production).
+- In Authentication > URL Configuration, set Site URL to your deployed website origin.
+- Add these Redirect URLs (adjust domain/path to your deployment):
+  https://YOUR-DOMAIN/verify.html
+  https://YOUR-DOMAIN/reset-password.html
+  http://localhost:5500/verify.html
+  http://localhost:5500/reset-password.html
+
+4) ENABLE PHONE OTP
+- In Authentication > Providers > Phone, enable Phone provider / SMS sign-in.
+- Configure an SMS provider supported by Supabase (for example Twilio) and its credentials. SMS delivery may incur provider charges.
+- Use international phone format with country code, e.g. +919876543210.
+- Phone verification is completed after email confirmation: participant signs in, opens Verify Mobile, receives an SMS code and enters it.
+- Test SMS delivery and rate limits before announcing registration.
+
+5) HOST THE STATIC WEBSITE
+- Do not open the HTML files using file://. Use a local web server while testing, then deploy the folder to HTTPS hosting (Netlify, Vercel, GitHub Pages or your college server).
+- For local test with VS Code Live Server, the site is commonly http://127.0.0.1:5500; add the exact URL to Supabase Redirect URLs.
+- Add your deployed HTTPS domain to Authentication > URL Configuration.
+
+6) PARTICIPANT FLOW
+- signup.html: create account with name, college, department, year, email, phone and password.
+- Supabase sends email confirmation. Participant clicks the link and signs in.
+- verify.html: participant requests and enters SMS OTP.
+- dashboard.html: shows profile, available events and registered events.
+- register-event.html: register for one event. Database prevents duplicate registration and enforces max 3.
+- forgot-password.html / reset-password.html: reset a forgotten password using the email recovery link.
+
+7) UPDATE EVENT NAMES
+- The events currently match the sample event list from the supplied website. In Supabase Table Editor > events, edit names/descriptions, toggle is_active to false to hide an event, or add rows with category Technical / Non-Technical.
+- Keep event names unique. The public site events.html is a static overview; update it too when changing event descriptions.
+
+IMPORTANT NOTES
+- This frontend uses Supabase's anon/public key, which is intended for browser use; security comes from Row Level Security policies and database constraints/triggers.
+- Never disable RLS or publish a service_role key.
+- The max-three rule is enforced in PostgreSQL with a per-user advisory lock, including simultaneous registration attempts.
+- Participants can cancel their own event registrations through Supabase policy, but the current dashboard does not yet show a cancel button.
+- Admin dashboard / organizer reporting is not included in this participant system.
+- This package cannot be live-tested against your Supabase project until you provide/configure your own project URL, public key, email SMTP and SMS provider.
